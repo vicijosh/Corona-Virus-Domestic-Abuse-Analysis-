@@ -1,0 +1,89 @@
+import io
+import pandas as pd
+import requests as r
+
+# variables needed for ease of file access
+path = 'C://Users//vicijosh//OneDrive//Documents//'
+file_1 = 'case_count2.csv'
+file_2 = 'abuse_neglect.csv'
+filepath = 'C://Users//vicijosh//OneDrive//Documents//output_data//'
+file_out1 = 'covid_abuse_neglect.csv'
+
+# pull data from the 1st csv
+df_cases = pd.read_csv(path + file_1, encoding= 'unicode_escape')  
+df_cases
+df_cases.dtypes
+
+# pull data from the 2nd csv
+df_abuse = pd.read_csv(path + file_2)
+df_abuse
+df_abuse.dtypes
+
+# getting abuse and neglect dataset ready to merge
+# make sure number of counties is correct (254 in total)
+df_abuse['County'].value_counts()
+df_abuse.drop(df_abuse[df_abuse['County'] == 'Out of State'].index, axis = 0, inplace = True)
+df_abuse['County'].value_counts()
+
+# replace missing data with 0's
+df_abuse['Victims'].fillna(0, inplace=True)
+
+df_abuse['Not Confirmed'] = 'blank'
+df_abuse['Confirmed Victim'] = 'blank'
+df_abuse['Not Confirmed'][df_abuse['Confirmed Victims'] == 'Not Confirmed'] = df_abuse['Victims']
+df_abuse['Confirmed Victim'][df_abuse['Confirmed Victims'] == 'Confirmed Victim'] = df_abuse['Victims']
+df_abuse.dtypes
+
+# creating the two new dataframes
+df_abuse_confirm = df_abuse[['Fiscal Year', 'County', 'Confirmed Victim']]
+df_abuse_notconfirm = df_abuse[['Fiscal Year', 'County', 'Not Confirmed']]
+
+# clean up
+df_abuse_confirm.drop(df_abuse_confirm[df_abuse['Confirmed Victim'] == 'blank'].index, axis = 0, inplace = True)
+df_abuse_notconfirm.drop(df_abuse_notconfirm[df_abuse['Not Confirmed'] == 'blank'].index, axis = 0, inplace = True)
+
+# correcting datatypes
+df_abuse_confirm.dtypes
+df_abuse_confirm['Confirmed Victim'] = pd.to_numeric(df_abuse_confirm['Confirmed Victim'])
+df_abuse_confirm.dtypes
+
+df_abuse_notconfirm.dtypes
+df_abuse_notconfirm['Not Confirmed'] = pd.to_numeric(df_abuse_notconfirm['Not Confirmed'])
+df_abuse_notconfirm.dtypes
+
+# merging the two back together for our abuse dataframe
+df_abuse_all_merge = df_abuse_confirm.merge(df_abuse_notconfirm, how = 'inner', on = ['Fiscal Year', 'County'])
+df_abuse_all_merge.dtypes
+
+
+# getting covid dataset ready to merge
+df_cases['County Name'].value_counts()
+total_cases = df_cases.iloc[254]
+df_cases.drop(254, axis = 0, inplace = True)
+df_cases['County Name'].value_counts()
+df_cases['Total Cases'] = df_cases.sum(axis = 1)
+df_cases2 = df_cases[['County Name', 'Total Cases']]
+df_cases2.dtypes
+
+df_cases.drop('Total Cases', inplace = True, axis = 1)
+
+# fixing column as dates issue
+print(df_cases.columns[1:len(df_cases.columns)])
+case_df = df_cases.melt(id_vars = 'County Name', value_vars = df_cases.columns[1:len(df_cases.columns)])
+case_df.rename(columns = {'variable' : 'Date'}, inplace=True)
+case_df['Date'] = pd.to_datetime(case_df['Date'])
+case_df['Year'] = case_df['Date'].dt.year
+df_cases2['Year'] = case_df['Year']
+df_cases2.dtypes
+
+# merge the two datasets and clean up a bit
+case_abuse_join = df_abuse_all_merge.merge(df_cases2, how = 'left', left_on = ['Fiscal Year', 'County'], right_on = ['Year', 'County Name'])
+case_abuse_join
+
+case_abuse_join.drop('Year', inplace = True, axis = 1)
+case_abuse_join.drop('County Name', inplace = True, axis = 1)
+
+case_abuse_join.dtypes
+
+#print this to a csv file
+case_abuse_join[['Fiscal Year', 'County', 'Confirmed Victim', 'Not Confirmed',  'Total Cases']].to_csv(filepath + file_out1, sep='|', index = False)        

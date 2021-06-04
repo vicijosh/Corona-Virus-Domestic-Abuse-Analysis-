@@ -1,17 +1,5 @@
                             Corona-Virus-Domestic-Abuse-Analysis
-          Table of Contents
-Project Introduction	3
-Data Analysis	4
-Data Cleaning	5
-Data Merging	8
-Visualizations	10
-Analyses of the Data	12
-Flow Diagram	14
-Instructions for Code	15
-References	16
-
-![image](https://user-images.githubusercontent.com/73721493/120853730-bb3fd180-c541-11eb-8644-e4421e408275.png)
-
+         
                                   Project Introduction
 I chose two data sets to base our analysis on. The first shows the total number of COVID-19 cases by counties in Texas from March of 2020 to April of 2021. The second dataset shows the number of abuse and neglect cases in Texas by county from 2011 to 2020. Initially, I ran into some issues with these two datasets. In the COVID dataset, there were some rows within the original source file that explained the data, so I had to make sure to delete rows with unmeaningful data. In the abuse and neglect dataset, there were rows of data called "Out of State", which contained the number of both confirmed and not confirmed victims within each year that were not in the state of Texas. I excluded these lines to only have the data for within the state of Texas. I also had some granularity issues, because the COVID cases were separated by date using month, day, year, while the abuse dataset was sorted by year alone. I also ran into the issue of the dates being listed by columns on one dataset, but by rows on the other. Lastly, the original dataset for the abuse and neglect cases had some missing data, so I had to figure out a way to handle our missing values.
 I chose these two datasets because the data on both are sorted by the 254 counties in Texas. I was able to make the county names our natural key for the merge between these two files. After converting the date from the COVID dataset to year instead of date, month, and year format, I will also be able to merge the two datasets on the year variable as well. In this project, I hope to analyze the number of abuse and neglect cases before and after COVID hit Texas to see any increase or decrease in the number of victims within the state.
@@ -61,4 +49,4 @@ To run our code on your own computer, there are some minor adjustments that need
 Godin, Mélissa. “How Coronavirus Is Affecting Victims of Domestic Violence.” Time, Time,  18 Mar. 2020, www.time.com/5803887/coronavirus-domestic-violence-victims/ 
 Sonia Bhalotra. “Job Displacement, Unemployment Benefits, and Domestic Violence.” VOX, CEPR Policy Portal, www.voxeu.org/article/job-displacement-unemployment-benefits-and-domestic-violence 
 TX DFPS Data and Decision Support. “CPI 3.8 Abuse/Neglect Investigations - Alleged and Confirmed Victims By County FY2011-FY2020: Open Data Portal.” Https://Data.texas.gov/, 19 Mar. 2021, data.texas.gov/dataset/CPI-3-8-Abuse-Neglect-Investigations-Alleged-and-C/v63e-6dss.
-![image](https://user-images.githubusercontent.com/73721493/120853843-e32f3500-c541-11eb-835a-e2ca7ef94a1f.png)
+
